@@ -21,11 +21,13 @@ export default function RecoilNexus() {
             return snapshot.getPromise(atom)
         }, [])
 
-    nexus.set = useRecoilCallback(({ transact_UNSTABLE }) => {
+    nexus.set = useRecoilCallback(({ snapshot, gotoSnapshot }) => {
         return function <T>(atom: RecoilState<T>, valOrUpdater: T | ((currVal: T) => T)) {
-            transact_UNSTABLE(({ set }) => {
-                set(atom, valOrUpdater)
+            const newSnapshot = snapshot.map(mutable => {
+                mutable.set(atom, valOrUpdater)
             })
+
+            gotoSnapshot(newSnapshot)
         }
     }, [])
 
